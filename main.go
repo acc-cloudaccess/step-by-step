@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/takama/router"
-	"net/http"
 )
 
 // Run server: go run main.go
@@ -11,41 +13,22 @@ import (
 // - curl http://localhost:8000
 // - curl http://localhost:8000/test-some-path
 func main() {
+	logger := log.New(os.Stdout, "[step-by-step] ", log.LstdFlags)
+
+	logger.Print("Запускаем приложение...")
+
 	r := router.New()
 
-	a := 5
+	r.GET("/", home)
 
-	r.POST("/api/v1/users", mw(a, abc))
-
+	logger.Print("Готовимся слушать порт...")
 	r.Listen(":8000")
 }
 
-func mw(a int, h router.Handle) router.Handle {
-	// ? как передать a в h?
-	return h
-}
-
-func pampam(c *router.Control) {
-	fmt.Fprintf(
-		c.Writer, "URL.Path = %q\n", c.Request.URL.Path,
-	)
-
-}
-
-func abc(c *router.Control) {
-	fmt.Fprintf(
-		c.Writer, "a = ?",
-	)
-
-}
-
 func home(c *router.Control) {
+	log.Print("Хэндлер home поймал запрос")
 	fmt.Fprintf(
 		c.Writer, "URL.Path = %q\n", c.Request.URL.Path,
 	)
 
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "URL.Path = %q\n", r.URL.Path)
 }
